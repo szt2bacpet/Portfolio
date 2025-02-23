@@ -1,67 +1,64 @@
 <script setup>
-import {ref, reactive, computed} from 'vue';
-import {sendEmail} from '../services/emailService.js';
+import { ref, reactive, computed } from 'vue';
+import { sendEmail } from '../services/emailService.js';
 import FormInput from './FormInput.vue';
 import FormTextarea from './FormTextarea.vue';
 
-const title = 'Vue Contact Form';
-const showForm =ref(true);
-const successMessage = ref('')
+const title = 'Kapcsolat';
+const showForm = ref(true);
+const successMessage = ref('');
 
-const initialContactForm ={
+const initialContactForm = {
   name: '',
   subject: '',
   email: '',
   message: '',
   file: null
-  };
+};
 
-  const initialtouched = {
-    name: false,
-    subject: false,
-    email: false,
-    message: false,
-  };
+const initialTouched = {
+  name: false,
+  subject: false,
+  email: false,
+  message: false,
+};
 
-  const contactForm = reactive({...initialContactForm});
-  const touched = reactive({...initialtouched});
+const contactForm = reactive({ ...initialContactForm });
+const touched = reactive({ ...initialTouched });
 
-  function setTouched(field){
-    touched[field] = true;
-  }
+function setTouched(field) {
+  touched[field] = true;
+}
 
- const errors = reactive({
-  name: computed(()=> (!contactForm.name && touched.name) ? 'Név megadása szükséges' : ''),
-  subject: computed(()=> (!contactForm.subject && touched.subject) ? 'Tárgy magadása szükséges' : ''),
-  email: computed(()=> {
-    if(touched.email) {
+const errors = reactive({
+  name: computed(() => (!contactForm.name && touched.name) ? 'Név megadása szükséges' : ''),
+  subject: computed(() => (!contactForm.subject && touched.subject) ? 'Tárgy megadása szükséges' : ''),
+  email: computed(() => {
+    if (touched.email) {
       if (!contactForm.email) return 'Email megadása szükséges';
-      if(!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/.test(contactForm.email)) return 'Valid email címet adjon meg';
+      if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/.test(contactForm.email)) return 'Érvényes email címet adjon meg';
     }
     return '';
-  
- }),
- message: computed(()=> (!contactForm.message && touched.message) ? 'Üzenet magadása szükséges' : '')
+  }),
+  message: computed(() => (!contactForm.message && touched.message) ? 'Üzenet megadása szükséges' : '')
 });
 
-const isFormValid = computed(()=>{
+const isFormValid = computed(() => {
   const allFieldsTouched = Object.values(touched).every(t => t);
   const noErrors = !Object.values(errors).some(e => e);
-  
   return allFieldsTouched && noErrors;
 });
 
-function onFileSelected($event){
+function onFileSelected($event) {
   contactForm.file = $event.target.files[0];
 }
 
-
-function resetForm(){
-  setTimeout(()=> {
+function resetForm() {
+  setTimeout(() => {
     successMessage.value = '';
     showForm.value = true;
     Object.assign(contactForm, initialContactForm);
-    Object.assign(touched, initialtouched);
+    Object.assign(touched, initialTouched);
   }, 5000);
 }
 
@@ -93,12 +90,12 @@ async function onSubmit() {
     console.log('Az űrlap nem megfelelő');
   }
 }
-
 </script>
 
 <template>
-    <div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 class="text-2xl font-bold mb-4 text-center">{{ title }}</h2>
+  <div class="min-h-screen flex items-center justify-center bg-white p-4">
+    <div class="w-full max-w-2xl bg-white rounded-lg shadow-sm p-6">
+      <h2 class="text-2xl font-semibold mb-6 text-center text-gray-800">{{ title }}</h2>
       
       <form @submit.prevent="onSubmit" class="space-y-4">
         <FormInput 
@@ -107,7 +104,7 @@ async function onSubmit() {
           placeholder="Add meg a neved" 
           :error="errors.name" 
           @blur="setTouched('name')" 
-          class="w-full"
+          class="w-full bg-gray-50 placeholder-gray-500"
         />
         
         <FormInput 
@@ -116,7 +113,7 @@ async function onSubmit() {
           placeholder="Add meg az üzenet tárgyát" 
           :error="errors.subject" 
           @blur="setTouched('subject')" 
-          class="w-full"
+          class="w-full bg-gray-50 placeholder-gray-500"
         />
         
         <FormInput 
@@ -126,7 +123,7 @@ async function onSubmit() {
           placeholder="Add meg az email címed" 
           :error="errors.email" 
           @blur="setTouched('email')" 
-          class="w-full"
+          class="w-full bg-gray-50 placeholder-gray-500"
         />
         
         <FormTextarea 
@@ -136,7 +133,7 @@ async function onSubmit() {
           :rows="5" 
           :error="errors.message" 
           @blur="setTouched('message')" 
-          class="w-full"
+          class="w-full bg-gray-50 placeholder-gray-500"
         />
         
         <div>
@@ -144,14 +141,14 @@ async function onSubmit() {
           <input 
             type="file" 
             @change="onFileSelected" 
-            class="mt-2 w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="mt-2 w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 placeholder-gray-500"
           />
         </div>
         
         <button 
           type="submit" 
           :disabled="!isFormValid" 
-          class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg text-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
+          class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg text-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
         >
           Küldés
         </button>
@@ -161,5 +158,12 @@ async function onSubmit() {
         {{ successMessage }}
       </p>
     </div>
-  </template>
-  
+  </div>
+</template>
+
+<style scoped>
+::placeholder {
+  color: #6b7280; 
+  opacity: 1; 
+}
+</style>
